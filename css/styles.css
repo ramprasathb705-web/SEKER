@@ -1,0 +1,726 @@
+/* ========================================================
+   WeatherNow — Advanced CSS3 Responsive Architecture
+   Mobile-first · CSS Grid + Flexbox · CSS Custom Properties
+   Glassmorphism · Dark/Light theme · Animated states
+   Author: ramprasathb705-web
+   ======================================================== */
+
+/* ── 0. CSS Custom Properties (Design Tokens) ──────────── */
+:root {
+  /* Dark theme (default) */
+  --bg-app:          #0f172a;
+  --bg-layer:        #1e293b;
+  --bg-card:         rgba(30, 41, 59, 0.65);
+  --bg-card-hover:   rgba(30, 41, 59, 0.85);
+  --border-color:    rgba(255, 255, 255, 0.08);
+
+  --text-primary:    #f1f5f9;
+  --text-secondary:  #94a3b8;
+  --text-muted:      #64748b;
+
+  --accent:          #38bdf8;
+  --accent-glow:     rgba(56, 189, 248, 0.25);
+  --accent-dark:     #0284c7;
+
+  --error-bg:        rgba(239, 68, 68, 0.15);
+  --error-border:    rgba(239, 68, 68, 0.4);
+  --error-text:      #fca5a5;
+
+  --success-bg:      rgba(34, 197, 94, 0.15);
+  --success-text:    #86efac;
+
+  --shadow-sm:       0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:       0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:       0 12px 40px rgba(0,0,0,0.6);
+  --shadow-accent:   0 0 30px rgba(56, 189, 248, 0.2);
+
+  --radius-sm:       8px;
+  --radius-md:       16px;
+  --radius-lg:       24px;
+  --radius-full:     9999px;
+
+  --transition:      200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-sans:       'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Fluid type scale using clamp() */
+  --fs-xs:   clamp(0.7rem,  1.5vw, 0.75rem);
+  --fs-sm:   clamp(0.8rem,  2vw,   0.875rem);
+  --fs-base: clamp(0.9rem,  2.5vw, 1rem);
+  --fs-md:   clamp(1rem,    3vw,   1.125rem);
+  --fs-lg:   clamp(1.125rem,3.5vw, 1.375rem);
+  --fs-xl:   clamp(1.5rem,  5vw,   2rem);
+  --fs-2xl:  clamp(2rem,    7vw,   3.5rem);
+  --fs-3xl:  clamp(2.5rem,  9vw,   5rem);
+
+  --container-max: 1100px;
+  --container-pad: clamp(1rem, 5vw, 2rem);
+}
+
+/* Light theme overrides */
+[data-theme="light"] {
+  --bg-app:        #f0f9ff;
+  --bg-layer:      #e0f2fe;
+  --bg-card:       rgba(255, 255, 255, 0.7);
+  --bg-card-hover: rgba(255, 255, 255, 0.92);
+  --border-color:  rgba(0, 0, 0, 0.08);
+
+  --text-primary:  #0f172a;
+  --text-secondary:#334155;
+  --text-muted:    #64748b;
+
+  --accent:        #0284c7;
+  --accent-glow:   rgba(2, 132, 199, 0.2);
+
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.15);
+  --shadow-lg:     0 12px 40px rgba(0,0,0,0.2);
+  --shadow-accent: 0 0 30px rgba(2, 132, 199, 0.15);
+
+  --error-bg:      rgba(239, 68, 68, 0.08);
+  --error-border:  rgba(239, 68, 68, 0.3);
+  --error-text:    #b91c1c;
+}
+
+/* ── 1. CSS Reset & Base ───────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100svh;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  color: var(--text-primary);
+  background-color: var(--bg-app);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56,189,248,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 90%,  rgba(56,189,248,0.07) 0%, transparent 60%);
+  background-attachment: fixed;
+  transition:
+    background-color var(--transition-slow),
+    color var(--transition-slow);
+  line-height: 1.6;
+}
+
+img { display: block; max-width: 100%; }
+button { cursor: pointer; }
+a { color: var(--accent); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+
+/* ── 2. Accessibility Utilities ────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 10000;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  transition: top var(--transition);
+}
+.skip-link:focus { top: 1rem; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus ring — visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── 3. Layout Utilities ───────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* Glassmorphism card base */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-md);
+  transition:
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+.card:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-lg), var(--shadow-accent);
+  transform: translateY(-2px);
+}
+
+/* ── 4. Header ─────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 0;
+  transition: background var(--transition-slow);
+}
+
+[data-theme="light"] .site-header {
+  background: rgba(240, 249, 255, 0.85);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+.brand-icon { font-size: 1.5rem; }
+.brand-name { color: var(--accent); }
+
+/* Header controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+.btn-icon:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-accent);
+  transform: scale(1.1);
+}
+.btn-icon:active { transform: scale(0.95); }
+
+/* ── 5. Search Section ─────────────────────────────────── */
+.search-section {
+  padding: clamp(2.5rem, 8vh, 5rem) 0 clamp(1.5rem, 4vh, 3rem);
+  text-align: center;
+}
+
+.search-headline {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1.75rem;
+  color: var(--text-primary);
+}
+.search-headline .accent { color: var(--accent); }
+
+/* Search form */
+.search-form { width: 100%; }
+
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  max-width: 620px;
+  margin-inline: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 0.35rem 0.35rem 1.25rem;
+  gap: 0.5rem;
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+.search-input-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 0 3px var(--accent-glow);
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-width: 0;
+}
+.search-input::placeholder { color: var(--text-muted); }
+
+/* Remove Safari search field styling */
+.search-input::-webkit-search-cancel-button { display: none; }
+
+.search-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+.search-btn:hover {
+  background: var(--accent-dark);
+  box-shadow: 0 4px 16px var(--accent-glow);
+  transform: scale(1.03);
+}
+.search-btn:active { transform: scale(0.97); }
+
+/* Recent searches */
+.recent-searches {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+  animation: fade-in 0.3s ease;
+}
+
+.recent-label {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+}
+
+.recent-chip {
+  padding: 0.25rem 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.recent-chip:hover,
+.recent-chip:focus-visible {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* ── 6. Loading Overlay ────────────────────────────────── */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+/* ── 7. Error Card ─────────────────────────────────────── */
+.error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  margin-block: 1.5rem;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  animation: slide-up 0.3s ease;
+}
+
+.error-icon { font-size: 2rem; }
+
+.error-message {
+  font-size: var(--fs-md);
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1.5rem;
+  background: transparent;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-full);
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+}
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── 8. Weather Dashboard ──────────────────────────────── */
+.weather-dashboard {
+  padding-bottom: clamp(2rem, 6vh, 4rem);
+  animation: fade-in 0.5s ease;
+}
+
+/* ── 8a. Weather Hero Card ─────────────────────────────── */
+.weather-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  margin-bottom: 1.25rem;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle gradient shimmer behind hero */
+.weather-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 1;
+}
+
+.w-city {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.w-country {
+  font-size: var(--fs-md);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.w-date {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.w-desc {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  margin-top: 0.25rem;
+}
+
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.w-icon {
+  width: clamp(64px, 12vw, 100px);
+  height: clamp(64px, 12vw, 100px);
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px var(--accent-glow));
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.temp-wrap {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+}
+.w-temp {
+  font-size: var(--fs-3xl);
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -2px;
+}
+.temp-unit {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ── 8b. Metric Cards Grid ─────────────────────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.metric-card {
+  padding: clamp(0.875rem, 3vw, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.metric-icon { font-size: 1.5rem; }
+
+.metric-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metric-value {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* ── 8c. 3-Day Forecast ────────────────────────────────── */
+.forecast-section {
+  margin-top: 0.5rem;
+}
+
+.section-heading {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+
+.forecast-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.forecast-card {
+  padding: clamp(0.75rem, 3vw, 1.25rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.fc-day {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.fc-icon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px var(--accent-glow));
+}
+
+.fc-desc {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.fc-temps {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.fc-high {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.fc-low {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* ── 9. Empty State ────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: clamp(2rem, 8vh, 5rem) 1rem;
+  animation: fade-in 0.4s ease;
+}
+
+.empty-illustration {
+  font-size: clamp(4rem, 12vw, 7rem);
+  margin-bottom: 1.25rem;
+  animation: float 6s ease-in-out infinite;
+}
+
+.empty-heading {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.empty-sub {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin-inline: auto;
+  line-height: 1.7;
+}
+
+/* ── 10. Footer ────────────────────────────────────────── */
+.site-footer {
+  margin-top: auto;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
+.footer-note { color: var(--text-muted); opacity: 0.7; }
+
+/* ── 11. Animations ────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 12. Responsive — Tablet (≥ 640px) ────────────────── */
+@media (min-width: 640px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .w-icon {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* ── 13. Responsive — Desktop (≥ 1024px) ──────────────── */
+@media (min-width: 1024px) {
+  .metrics-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .weather-hero {
+    padding: 2.5rem;
+  }
+}
+
+/* ── 14. Reduced Motion ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── 15. Print ─────────────────────────────────────────── */
+@media print {
+  .site-header,
+  .search-section,
+  .site-footer { display: none; }
+  .weather-dashboard { padding-top: 0; }
+  .card { border: 1px solid #ccc; box-shadow: none; }
+}

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <!-- =====================================================
+       Weather Dashboard — Semantic HTML5 + WCAG 2.2 AA
+       API: wttr.in (no key required, CORS-enabled)
+       Author: ramprasathb705-web
+  ====================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Real-time weather dashboard. Search any city to get live temperature, humidity, wind speed, and a 3-day forecast powered by wttr.in." />
+  <meta name="keywords" content="weather, forecast, temperature, humidity, wind speed, real-time weather" />
+  <meta name="author" content="ramprasathb705-web" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="WeatherNow — Real-Time Weather Dashboard" />
+  <meta property="og:description" content="Live weather data for any city worldwide. Powered by wttr.in." />
+  <meta property="og:type" content="website" />
+
+  <!-- Theme-color for mobile browsers -->
+  <meta name="theme-color" content="#0f172a" />
+
+  <title>WeatherNow — Real-Time Weather Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://wttr.in" />
+</head>
+<body>
+
+  <!-- ── Skip Navigation (Accessibility) ──────────────── -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ── HEADER ────────────────────────────────────────── -->
+  <header class="site-header" role="banner">
+    <div class="header-inner container">
+      <!-- Brand -->
+      <div class="brand" aria-label="WeatherNow brand logo">
+        <span class="brand-icon" aria-hidden="true">🌤️</span>
+        <span class="brand-name">WeatherNow</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="header-controls">
+        <!-- Theme Toggle -->
+        <button
+          id="theme-toggle"
+          class="btn-icon"
+          aria-label="Toggle light/dark theme"
+          aria-pressed="false"
+          title="Toggle theme"
+        >
+          <span class="theme-icon" aria-hidden="true">☀️</span>
+        </button>
+
+        <!-- Geolocation Button -->
+        <button
+          id="geo-btn"
+          class="btn-icon"
+          aria-label="Use my current location"
+          title="Use my location"
+        >
+          <span aria-hidden="true">📍</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN ──────────────────────────────────────────── -->
+  <main id="main-content" tabindex="-1">
+
+    <!-- ── Search Section ──────────────────────────────── -->
+    <section class="search-section container" aria-label="City search">
+      <h1 class="search-headline">
+        Get Real-Time Weather<br />
+        <span class="accent">Anywhere in the World</span>
+      </h1>
+
+      <form
+        id="search-form"
+        class="search-form"
+        role="search"
+        aria-label="Search for weather by city name"
+        novalidate
+      >
+        <div class="search-input-wrap">
+          <label for="city-input" class="visually-hidden">Enter city name</label>
+          <input
+            id="city-input"
+            type="search"
+            class="search-input"
+            placeholder="Search city… e.g. London, Tokyo"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-required="true"
+            aria-describedby="search-hint"
+            maxlength="100"
+          />
+          <button type="submit" class="search-btn" aria-label="Search weather">
+            <span aria-hidden="true">🔍</span>
+            <span class="btn-text">Search</span>
+          </button>
+        </div>
+        <p id="search-hint" class="visually-hidden">
+          Type a city name and press Enter or click Search to get live weather data.
+        </p>
+      </form>
+
+      <!-- Recent Searches -->
+      <nav
+        id="recent-searches"
+        class="recent-searches"
+        aria-label="Recent city searches"
+        hidden
+      >
+        <p class="recent-label">Recent:</p>
+        <ul id="recent-list" class="recent-list" role="list"></ul>
+      </nav>
+    </section>
+
+    <!-- ── Loading Overlay ─────────────────────────────── -->
+    <div
+      id="loading-overlay"
+      class="loading-overlay"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading weather data"
+      hidden
+    >
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-text">Fetching weather data…</p>
+    </div>
+
+    <!-- ── Error Card ──────────────────────────────────── -->
+    <section
+      id="error-card"
+      class="error-card container"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      hidden
+    >
+      <span class="error-icon" aria-hidden="true">⚠️</span>
+      <p id="error-message" class="error-message">Something went wrong.</p>
+      <button id="error-retry" class="btn-secondary">Try Again</button>
+    </section>
+
+    <!-- ── Weather Dashboard ───────────────────────────── -->
+    <div id="weather-dashboard" class="weather-dashboard container" hidden aria-label="Weather information">
+
+      <!-- Current Weather Hero Card -->
+      <section class="weather-hero card" aria-label="Current weather conditions">
+        <div class="hero-left">
+          <p id="w-city" class="w-city" aria-label="City name">—</p>
+          <p id="w-country" class="w-country" aria-label="Country">—</p>
+          <p id="w-date" class="w-date" aria-label="Current date and time">—</p>
+          <p id="w-desc" class="w-desc" aria-label="Weather description">—</p>
+        </div>
+        <div class="hero-right">
+          <img
+            id="w-icon"
+            class="w-icon"
+            src=""
+            alt="Weather condition icon"
+            width="96"
+            height="96"
+          />
+          <p class="temp-wrap" aria-label="Temperature">
+            <span id="w-temp" class="w-temp">—</span>
+            <span class="temp-unit" aria-hidden="true">°C</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- Metric Cards Grid -->
+      <section class="metrics-grid" aria-label="Detailed weather metrics">
+
+        <article class="metric-card card" aria-label="Feels like temperature">
+          <span class="metric-icon" aria-hidden="true">🌡️</span>
+          <p class="metric-label">Feels Like</p>
+          <p id="m-feels" class="metric-value">—</p>
+        </article>
+
+        <article class="metric-card card" aria-label="Humidity percentage">
+          <span class="metric-icon" aria-hidden="true">💧</span>
+          <p class="metric-label">Humidity</p>
+          <p id="m-humidity" class="metric-value">—</p>
+        </article>
+
+        <article class="metric-card card" aria-label="Wind speed">
+          <span class="metric-icon" aria-hidden="true">💨</span>
+          <p class="metric-label">Wind Speed</p>
+          <p id="m-wind" class="metric-value">—</p>
+        </article>
+
+        <article class="metric-card card" aria-label="Visibility distance">
+          <span class="metric-icon" aria-hidden="true">👁️</span>
+          <p class="metric-label">Visibility</p>
+          <p id="m-visibility" class="metric-value">—</p>
+        </article>
+
+        <article class="metric-card card" aria-label="UV Index">
+          <span class="metric-icon" aria-hidden="true">☀️</span>
+          <p class="metric-label">UV Index</p>
+          <p id="m-uv" class="metric-value">—</p>
+        </article>
+
+        <article class="metric-card card" aria-label="Cloud coverage">
+          <span class="metric-icon" aria-hidden="true">☁️</span>
+          <p class="metric-label">Cloud Cover</p>
+          <p id="m-cloud" class="metric-value">—</p>
+        </article>
+
+      </section>
+
+      <!-- 3-Day Forecast Strip -->
+      <section class="forecast-section" aria-label="3-day weather forecast">
+        <h2 class="section-heading">3-Day Forecast</h2>
+        <div id="forecast-strip" class="forecast-strip" role="list" aria-label="Daily forecast cards"></div>
+      </section>
+
+    </div><!-- /weather-dashboard -->
+
+    <!-- ── Empty State ─────────────────────────────────── -->
+    <section
+      id="empty-state"
+      class="empty-state container"
+      aria-label="No weather data yet"
+    >
+      <div class="empty-illustration" aria-hidden="true">🌍</div>
+      <h2 class="empty-heading">Where are you headed?</h2>
+      <p class="empty-sub">
+        Search for any city above to get live temperature, humidity,
+        wind speed, and a 3-day forecast — instantly.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner container">
+      <p>
+        Powered by
+        <a
+          href="https://wttr.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="wttr.in weather service (opens in new tab)"
+        >wttr.in</a>
+        &nbsp;·&nbsp; Built with ❤️ by ramprasathb705-web
+      </p>
+      <p class="footer-note">Data refreshes on each search. No API key required.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
